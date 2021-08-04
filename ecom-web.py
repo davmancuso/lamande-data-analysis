@@ -11,33 +11,33 @@ import matplotlib.pyplot as plt
 # ------------------------------
 #             STYLE
 # ------------------------------
-st.markdown("""
-    <style type='text/css'>
+# st.markdown("""
+#     <style type='text/css'>
 
-        /* ...styles... */
+#         /* ...styles... */
     
-    </style>
-""", unsafe_allow_html=True)
+#     </style>
+# """, unsafe_allow_html=True)
 
 # ------------------------------
 #             LINGUA
 # ------------------------------
-locale.setlocale(locale.LC_ALL , 'it_IT')
+# locale.setlocale(locale.LC_ALL , 'it_IT')
 
-it_IT_format = {
-    "decimal": ",",
-    "thousands": ".",
-    "grouping": [3],
-    "currency": ["€", ""],
-    "dateTime": "%a, %e %b %Y - %X",
-    "date": "%d/%m/%Y",
-    "time": "%H:%M:%S",
-    "periods": ["AM", "PM"],
-    "days": ["Domenica", "Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato"],
-    "shortDays": ["Dom", "Lun", "Mar", "Mer", "Gio", "Ven", "Sab"],
-    "months": ["Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno", "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"],
-    "shortMonths": ["Gen", "Feb", "Mar", "Apr", "Mag", "Giu", "Lug", "Ago", "Set", "Ott", "Nov", "Dic"]
-}
+# it_IT_format = {
+#     "decimal": ",",
+#     "thousands": ".",
+#     "grouping": [3],
+#     "currency": ["€", ""],
+#     "dateTime": "%a, %e %b %Y - %X",
+#     "date": "%d/%m/%Y",
+#     "time": "%H:%M:%S",
+#     "periods": ["AM", "PM"],
+#     "days": ["Domenica", "Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato"],
+#     "shortDays": ["Dom", "Lun", "Mar", "Mer", "Gio", "Ven", "Sab"],
+#     "months": ["Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno", "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"],
+#     "shortMonths": ["Gen", "Feb", "Mar", "Apr", "Mag", "Giu", "Lug", "Ago", "Set", "Ott", "Nov", "Dic"]
+# }
 
 # Non funziona con Streamlit...
 # alt.renderers.set_embed_options(timeFormatLocale=it_IT_format)
