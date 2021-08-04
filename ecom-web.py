@@ -91,32 +91,31 @@ def data_cleaning(df):
 def daily_order(df):
     daily_totals = df.groupby(['cOrderDate']).sum()
 
-    plt.figure(figsize=(8,4), dpi=80)
-    plt.plot(daily_totals.index, daily_totals['OrderTotal'], color='black', marker='o')
-    plt.title('Fatturato giornaliero')
-    plt.xlabel('')
-    plt.xticks(rotation=45)
-    plt.ylabel('Fatturato (in Euro)')
-    plt.grid(True)
-    plt.tight_layout()
-    st.pyplot(plt)
-
-    # chart_data = pd.DataFrame({
-    #     'Data': daily_totals.index,
-    #     'Totale': daily_totals['OrderTotal']
-    # })
+    chart_data = pd.DataFrame({
+        'Data': daily_totals.index,
+        'Totale': daily_totals['OrderTotal']
+    })
     
-    # st.altair_chart(
-    #     alt.Chart(chart_data, title="Fatturato giornaliero")
-    #         .mark_line(point=True)
-    #         .encode(
-    #             alt.X('Data', title='Data'),
-    #             alt.Y('Totale', title='Totale (in Euro)'),
-    #             tooltip=[
-    #                 alt.Tooltip('Totale', title="Fatturato", format=",.5r")
-    #             ],
-    #         ), use_container_width=True
-    # )
+    st.altair_chart(
+        alt.Chart(
+            chart_data,
+            title="Fatturato giornaliero"
+        )
+        .mark_line(
+            point=True
+        )
+        .encode(
+            alt.X('Data', title='Data'),
+            alt.Y('Totale', title='Totale (in Euro)'),
+            tooltip=[
+                alt.Tooltip('Totale', title="Fatturato", format=",.5r")
+            ],
+        )
+        .interactive()
+        .configure_point(
+            size=100
+        ), use_container_width=True
+    )
 
 def spending_ranges(df):
     prices_bins = [0.00, 25.00, 50.00, 75.00, 100.00, 50000.00]
