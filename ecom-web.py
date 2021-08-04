@@ -7,7 +7,6 @@ import streamlit as st
 import altair as alt
 from datetime import datetime, timedelta
 import matplotlib.pyplot as plt
-import statsmodels.api as sm
 
 # ------------------------------
 #             STYLE
