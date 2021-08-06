@@ -11,13 +11,16 @@ import matplotlib.pyplot as plt
 # ------------------------------
 #             STYLE
 # ------------------------------
-# st.markdown("""
-#     <style type='text/css'>
+st.markdown("""
+    <style type='text/css'>
 
-#         /* ...styles... */
+        /* Remove sidebar X button */
+        [data-testid="stSidebar"] div div button {
+            display: none;
+        }
     
-#     </style>
-# """, unsafe_allow_html=True)
+    </style>
+""", unsafe_allow_html=True)
 
 # ------------------------------
 #             LINGUA
@@ -107,7 +110,8 @@ def daily_order(df):
             alt.X('Data', title='Data'),
             alt.Y('Totale', title='Totale (in Euro)'),
             tooltip=[
-                alt.Tooltip('Totale', title="Fatturato", format=",.5r")
+                alt.Tooltip('Data', title="Giorno", format="%d/%m/%Y"),
+                alt.Tooltip('Totale', title="Fatturato (in Euro)")
             ],
         )
         .interactive()
@@ -126,19 +130,45 @@ def spending_ranges(df):
         "Oltre € 100,00"
     ]
 
-    price_order_total = pd.cut(df['OrderTotal'].astype(float), bins=prices_bins, labels=prices_class).value_counts()
-    price_order_label = [
-        price_order_total.index[i] for i in range(len(price_order_total))
+    orders = [
+        len(df.loc[
+            (df['OrderTotal'] >= prices_bins[i - 1])
+            & (df['OrderTotal'] < prices_bins[i])
+        ])
+        for i in range(1, len(prices_class)+1)
     ]
 
-    plt.figure(figsize=(8,4), dpi=80)
-    plt.axis('equal')
-    plt.pie(x=price_order_total, autopct='%1.2f%%', shadow=False)
-    plt.title('Intervalli di spesa per singolo ordine')
-    plt.ylabel('')
-    plt.legend(labels=price_order_label, loc="upper right")
-    plt.tight_layout()
-    st.pyplot(plt)
+    totals = [
+        df.loc[
+            (df['OrderTotal'] >= prices_bins[i - 1])
+            & (df['OrderTotal'] < prices_bins[i])
+        ]['OrderTotal'].sum()
+        for i in range(1, len(prices_class)+1)
+    ]
+
+    chart_data = pd.DataFrame({
+        'Eta': prices_class,
+        'Ordini': orders,
+        'Totale': totals
+    })
+    
+    st.altair_chart(
+        alt.Chart(
+            chart_data,
+            title="Intervalli di spesa per singolo ordine"
+        )
+        .mark_bar()
+        .encode(
+            alt.X('Eta', title='Età', sort=prices_class),
+            alt.Y('Ordini', title='Ordini'),
+            tooltip=[
+                alt.Tooltip('Eta', title="Fascia"),
+                alt.Tooltip('Ordini', title="Ordini"),
+                alt.Tooltip('Totale', title="Fatturato (in Euro)")
+            ],
+        )
+        .interactive(), use_container_width=True
+    )
 
     return
 
@@ -226,7 +256,7 @@ st.subheader("Inserire la fonte")
 source = st.text_input("Fonte")
 
 st.subheader("Selezionare il periodo desiderato")
-start_date = st.date_input("Inizio", (datetime.today() - timedelta(days=365)))
+start_date = st.date_input("Inizio", (datetime.today() - timedelta(days=30)))
 end_date = st.date_input("Fine", datetime.today())
 
 st.subheader("Selezionare lo stato degli ordini")
