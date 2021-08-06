@@ -269,7 +269,10 @@ def spent_per_age(df):
     return
 
 def core_analysis(source, start_date, end_date, status, status_str):
-    if start_date > end_date:
+    if source == "":
+        st.error('Errore: Inserire la fonte da cui recuperare i dati')
+        return
+    elif start_date > end_date:
         st.error('Errore: La data di fine deve essere successiva alla data di inizio')
         return
     
@@ -284,7 +287,7 @@ def core_analysis(source, start_date, end_date, status, status_str):
         df_raw = pd.DataFrame(txt['Orders'])
         df = data_cleaning(df_raw)
 
-    st.title("Analisi degli ordini")
+    st.title("Analisi del dataset")
     st.subheader("Dati in oggetto")
     if status == "":
         status = "Tutti"
@@ -293,7 +296,7 @@ def core_analysis(source, start_date, end_date, status, status_str):
     st.subheader("Dataset")
     st.write(df)
 
-    st.title("Analisi degli ordini")
+    st.title("Analisi degli ordini e del fatturato")
     with st.spinner("Tracciamento del grafico \"Fatturato giornaliero\"..."):
         daily_order(df)
     
@@ -325,8 +328,8 @@ st.subheader("Inserire la fonte")
 source = st.text_input("Fonte")
 
 st.subheader("Selezionare il periodo desiderato")
-start_date = st.date_input("Inizio", (datetime.today() - timedelta(days=30)))
-end_date = st.date_input("Fine", datetime.today())
+start_date = st.date_input("Inizio", (datetime.today() - timedelta(days=31)))
+end_date = st.date_input("Fine", (datetime.today() - timedelta(days=1)))
 
 st.subheader("Selezionare lo stato degli ordini")
 display_status = ("Tutti", "Eseguiti", "Cancellati")
