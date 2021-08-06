@@ -98,10 +98,10 @@ def daily_order(df):
         'Totale': daily_totals['OrderTotal']
     })
     
+    st.subheader("Fatturato giornaliero")
     st.altair_chart(
         alt.Chart(
-            chart_data,
-            title="Fatturato giornaliero"
+            chart_data
         )
         .mark_line(
             point=True
@@ -147,23 +147,44 @@ def spending_ranges(df):
     ]
 
     chart_data = pd.DataFrame({
-        'Eta': prices_class,
+        'Fascia': prices_class,
         'Ordini': orders,
         'Totale': totals
     })
     
+    st.header("Analisi per fasce di prezzo")
+    st.subheader("Numero di ordini")
     st.altair_chart(
         alt.Chart(
             chart_data,
-            title="Intervalli di spesa per singolo ordine"
+            title="Intervalli di prezzo per ordine"
         )
         .mark_bar()
         .encode(
-            alt.X('Eta', title='Età', sort=prices_class),
+            alt.X('Fascia', title='Fascia di prezzo', sort=prices_class),
             alt.Y('Ordini', title='Ordini'),
             tooltip=[
-                alt.Tooltip('Eta', title="Fascia"),
+                alt.Tooltip('Fascia', title="Fascia"),
                 alt.Tooltip('Ordini', title="Ordini"),
+                alt.Tooltip('Totale', title="Fatturato (in Euro)")
+            ],
+        )
+        .interactive(), use_container_width=True
+    )
+
+    st.subheader("Fatturato totale")
+    st.altair_chart(
+        alt.Chart(
+            chart_data,
+            title="Intervalli di prezzo per fatturato"
+        )
+        .mark_bar()
+        .encode(
+            alt.X('Fascia', title='Fascia di prezzo', sort=prices_class),
+            alt.Y('Totale', title='Totale (in Euro)'),
+            tooltip=[
+                alt.Tooltip('Fascia', title="Fascia"),
+                alt.Tooltip('Totale', title="Totale (in Euro)"),
                 alt.Tooltip('Totale', title="Fatturato (in Euro)")
             ],
         )
@@ -184,19 +205,66 @@ def spent_per_age(df):
         "Oltre i 65 anni"
     ]
 
-    age_order_total = pd.cut(df['OrderTotal'].astype(float), bins=age_bins, labels=age_class).value_counts(dropna=True)
-    age_order_label = [
-        age_order_total.index[i] for i in range(len(age_order_total))
+    orders = [
+        len(df.loc[
+            (df['OrderTotal'] >= age_bins[i - 1])
+            & (df['OrderTotal'] < age_bins[i])
+        ])
+        for i in range(1, len(age_class)+1)
     ]
 
-    plt.figure(figsize=(8,4), dpi=80)
-    plt.axis('equal')
-    plt.pie(x=age_order_total, autopct='%1.2f%%', shadow=False)
-    plt.title('Range di spesa per età')
-    plt.ylabel('')
-    plt.legend(labels=age_order_label, loc="upper right")
-    plt.tight_layout()
-    st.pyplot(plt)
+    totals = [
+        df.loc[
+            (df['OrderTotal'] >= age_bins[i - 1])
+            & (df['OrderTotal'] < age_bins[i])
+        ]['OrderTotal'].sum()
+        for i in range(1, len(age_class)+1)
+    ]
+
+    chart_data = pd.DataFrame({
+        'Fascia': age_class,
+        'Ordini': orders,
+        'Totale': totals
+    })
+    
+    st.header("Analisi per fasce di età")
+    st.subheader("Numero di ordini")
+    st.altair_chart(
+        alt.Chart(
+            chart_data,
+            title="Intervalli di età per ordine"
+        )
+        .mark_bar()
+        .encode(
+            alt.X('Fascia', title='Fascia di età', sort=age_class),
+            alt.Y('Ordini', title='Ordini'),
+            tooltip=[
+                alt.Tooltip('Fascia', title="Fascia"),
+                alt.Tooltip('Ordini', title="Ordini"),
+                alt.Tooltip('Totale', title="Fatturato (in Euro)")
+            ],
+        )
+        .interactive(), use_container_width=True
+    )
+
+    st.subheader("Fatturato totale")
+    st.altair_chart(
+        alt.Chart(
+            chart_data,
+            title="Intervalli di età per fatturato"
+        )
+        .mark_bar()
+        .encode(
+            alt.X('Fascia', title='Fascia di età', sort=age_class),
+            alt.Y('Totale', title='Totale (in Euro)'),
+            tooltip=[
+                alt.Tooltip('Fascia', title="Fascia"),
+                alt.Tooltip('Ordini', title="Ordini"),
+                alt.Tooltip('Totale', title="Fatturato (in Euro)")
+            ],
+        )
+        .interactive(), use_container_width=True
+    )
 
     return
 
@@ -216,7 +284,8 @@ def core_analysis(source, start_date, end_date, status, status_str):
         df_raw = pd.DataFrame(txt['Orders'])
         df = data_cleaning(df_raw)
 
-    st.header("Anteprima generale")
+    st.title("Analisi degli ordini")
+    st.subheader("Dati in oggetto")
     if status == "":
         status = "Tutti"
     st.success("Ordini dal `%s` al `%s`\n\nStato degli ordini: `%s`" % (start_date.strftime("%d/%m/%Y"), end_date.strftime("%d/%m/%Y"), status_str))
@@ -224,7 +293,7 @@ def core_analysis(source, start_date, end_date, status, status_str):
     st.subheader("Dataset")
     st.write(df)
 
-    st.header("Analisi degli ordini")
+    st.title("Analisi degli ordini")
     with st.spinner("Tracciamento del grafico \"Fatturato giornaliero\"..."):
         daily_order(df)
     
