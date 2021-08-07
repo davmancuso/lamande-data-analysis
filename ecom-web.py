@@ -18,6 +18,11 @@ st.markdown("""
         [data-testid="stSidebar"] div div button {
             display: none;
         }
+
+        /* Remove footer */
+        footer {
+            display: none !important;
+        }
     
     </style>
 """, unsafe_allow_html=True)
@@ -48,6 +53,7 @@ st.markdown("""
 # ------------------------------
 #           FUNCTIONS
 # ------------------------------
+@st.cache
 def url_retrieving(source, start_date, end_date, status):
     start_date_url = str(start_date.strftime("%Y%m%d"))
     end_date_url = str(end_date.strftime("%Y%m%d"))
@@ -57,6 +63,7 @@ def url_retrieving(source, start_date, end_date, status):
 
     return resp.json()
 
+@st.cache
 def data_cleaning(df):
     df['OrderID'] = df['OrderID'].astype(int)
     df['cOrderDate'] = [odate.date() for odate in pd.to_datetime(df['OrderDate'])]
@@ -89,6 +96,29 @@ def data_cleaning(df):
     ]]
 
     return df
+
+def orders_retrieving(df):
+    return df.drop(columns=['OrderItems'])
+
+def products_retrieving(df):
+    items = pd.json_normalize(df['OrderItems']).join(
+        df[['OrderID', 'cOrderDate', 'OrderStatus']], how='left'
+    ).explode(
+        'Item'
+    ).reset_index(
+        drop=True
+    )
+
+    products = pd.json_normalize(items['Item']).join(
+        items[['OrderID', 'cOrderDate', 'OrderStatus']], how='left'
+    )
+
+    products['Quantity'] = products['Quantity'].astype(int)
+    products['ItemCost'] = products['ItemCost'].astype(float)
+    products['ItemTotal'] = products['ItemTotal'].astype(float)
+    products['Category'] = products['Category'].str.title()
+
+    return products
 
 def daily_order(df):
     daily_totals = df.groupby(['cOrderDate']).sum()
@@ -268,6 +298,34 @@ def spent_per_age(df):
 
     return
 
+def spent_per_product(df, keyword=None):
+    products = df['ProductName'].unique()
+
+    orders = [
+        len(df.loc[
+            df['ProductName'] == elem
+        ])
+        for elem in products
+    ]
+
+    totals = [
+        df.loc[
+            df['ProductName'] == elem
+        ]['ItemTotal'].sum()
+        for elem in products
+    ]
+
+    chart_data = pd.DataFrame({
+        'Prodotti': products,
+        'Ordini': orders,
+        'Totale': totals
+    })
+    
+    st.subheader("Ordini e fatturato per prodotti")
+    st.write(chart_data.sort_values(by=['Prodotti']).reset_index(drop=True))
+
+    return
+
 def core_analysis(source, start_date, end_date, status, status_str):
     if source == "":
         st.error('Errore: Inserire la fonte da cui recuperare i dati')
@@ -286,25 +344,43 @@ def core_analysis(source, start_date, end_date, status, status_str):
     with st.spinner("Pulizia del database degli ordini..."):
         df_raw = pd.DataFrame(txt['Orders'])
         df = data_cleaning(df_raw)
-
-    st.title("Analisi del dataset")
+    
     st.subheader("Dati in oggetto")
     if status == "":
         status = "Tutti"
     st.success("Ordini dal `%s` al `%s`\n\nStato degli ordini: `%s`" % (start_date.strftime("%d/%m/%Y"), end_date.strftime("%d/%m/%Y"), status_str))
 
+    # ---------- ORDINI ----------
+    st.title("Analisi degli ordini")
+
     st.subheader("Dataset")
-    st.write(df)
+    with st.spinner("Analisi degli ordini..."):
+        orders = orders_retrieving(df)
+        st.write(orders)
 
     st.title("Analisi degli ordini e del fatturato")
-    with st.spinner("Tracciamento del grafico \"Fatturato giornaliero\"..."):
-        daily_order(df)
+
+    with st.spinner("Analisi degli ordini per giorno..."):
+        daily_order(orders)
     
-    with st.spinner("Tracciamento del grafico \"Intervalli di spesa per singolo ordine\"..."):
-        spending_ranges(df)
+    with st.spinner("Analisi della spesa per fasce di prezzo..."):
+        spending_ranges(orders)
     
-    with st.spinner("Tracciamento del grafico \"Range di spesa per età\"..."):
-        spent_per_age(df)
+    with st.spinner("Analisi della spesa per fascia di età..."):
+        spent_per_age(orders)
+
+    # ---------- PRODOTTI ----------
+    st.title("Analisi dei prodotti")
+    
+    st.subheader("Dataset")
+    with st.spinner("Analisi dei prodotti..."):
+        products = products_retrieving(df)
+        st.write(products)
+
+    st.title("Analisi dei prodotti e del fatturato")
+
+    with st.spinner("Analisi dei prodotti per acquisto..."):
+        spent_per_product(products)
 
     return
 
