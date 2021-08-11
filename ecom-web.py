@@ -323,7 +323,7 @@ def spent_per_product_category(df):
 
     totals = [
         df.loc[
-            df['Category'].str.contains(category)
+            df['Category'].str.contains(category, na=False)
         ]['ItemTotal'].sum()
         for category in unique_categories
     ]
