@@ -311,6 +311,32 @@ def spent_per_product(df, keyword=None):
 
     return
 
+def spent_per_product_category(df):
+    unique_categories = sorted(pd.unique(df['Category'].str.split(';', expand=True).stack()))
+    
+    orders = [
+        len(df.loc[
+            df['Category'].str.contains(category)
+        ])
+        for category in unique_categories
+    ]
+
+    totals = [
+        df.loc[
+            df['Category'].str.contains(category)
+        ]['ItemTotal'].sum()
+        for category in unique_categories
+    ]
+
+    chart_data = pd.DataFrame({
+        'Categorie': unique_categories,
+        'Ordini': orders,
+        'Totale': totals
+    })
+    
+    st.subheader("Fatturato per categoria")
+    st.write(chart_data)
+
 # ------------------------------
 #             CORE
 # ------------------------------
@@ -369,6 +395,9 @@ def core_analysis(source, start_date, end_date, status, status_str):
 
     with st.spinner("Analisi dei prodotti per acquisto..."):
         spent_per_product(products)
+    
+    with st.spinner("Analisi delle categorie prodotto per acquisto..."):
+        spent_per_product_category(products)
 
     return
 
