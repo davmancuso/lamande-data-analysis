@@ -316,7 +316,7 @@ def spent_per_product_category(df):
     
     orders = [
         len(df.loc[
-            df['Category'].str.contains(category)
+            df['Category'].str.contains(category, na=False)
         ])
         for category in unique_categories
     ]
