@@ -400,8 +400,9 @@ st.sidebar.text("Agenzia: Brain on strategy srl\nWebsite: https://brainonstrateg
 # ------------------------------
 st.title("Parametri della analisi")
 
-st.subheader("Inserire la fonte")
-source = st.text_input("Fonte")
+# st.subheader("Inserire la fonte")
+# source = st.text_input("Fonte")
+source = st.secrets["url"]
 
 st.subheader("Selezionare il periodo desiderato")
 start_date = st.date_input("Inizio", (datetime.today() - timedelta(days=31)))
