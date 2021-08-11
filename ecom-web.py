@@ -90,7 +90,7 @@ def products_retrieving(df):
         items[['OrderID', 'cOrderDate', 'OrderStatus']], how='left'
     )
 
-    products['Quantity'] = products['Quantity'].astype(int)
+    products['Quantity'] = products['Quantity'].astype(float)
     products['ItemCost'] = products['ItemCost'].astype(float)
     products['ItemTotal'] = products['ItemTotal'].astype(float)
     products['Category'] = products['Category'].str.title()
