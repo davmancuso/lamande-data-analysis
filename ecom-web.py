@@ -1,4 +1,4 @@
-import locale
+import environ
 import json
 import requests
 import pandas as pd
@@ -26,29 +26,6 @@ st.markdown("""
     
     </style>
 """, unsafe_allow_html=True)
-
-# ------------------------------
-#             LINGUA
-# ------------------------------
-# locale.setlocale(locale.LC_ALL , 'it_IT')
-
-# it_IT_format = {
-#     "decimal": ",",
-#     "thousands": ".",
-#     "grouping": [3],
-#     "currency": ["€", ""],
-#     "dateTime": "%a, %e %b %Y - %X",
-#     "date": "%d/%m/%Y",
-#     "time": "%H:%M:%S",
-#     "periods": ["AM", "PM"],
-#     "days": ["Domenica", "Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato"],
-#     "shortDays": ["Dom", "Lun", "Mar", "Mer", "Gio", "Ven", "Sab"],
-#     "months": ["Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno", "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"],
-#     "shortMonths": ["Gen", "Feb", "Mar", "Apr", "Mag", "Giu", "Lug", "Ago", "Set", "Ott", "Nov", "Dic"]
-# }
-
-# Non funziona con Streamlit...
-# alt.renderers.set_embed_options(timeFormatLocale=it_IT_format)
 
 # ------------------------------
 #           FUNCTIONS
@@ -199,7 +176,9 @@ def spending_ranges(df):
                 alt.Tooltip('Totale', title="Fatturato (in Euro)")
             ],
         )
-        .interactive(), use_container_width=True
+        .configure_axisX(
+            labelAngle=0
+        ), use_container_width=True
     )
 
     st.subheader("Fatturato totale")
@@ -218,7 +197,9 @@ def spending_ranges(df):
                 alt.Tooltip('Totale', title="Fatturato (in Euro)")
             ],
         )
-        .interactive(), use_container_width=True
+        .configure_axisX(
+            labelAngle=0
+        ), use_container_width=True
     )
 
     return
@@ -274,7 +255,9 @@ def spent_per_age(df):
                 alt.Tooltip('Totale', title="Fatturato (in Euro)")
             ],
         )
-        .interactive(), use_container_width=True
+        .configure_axisX(
+            labelAngle=0
+        ), use_container_width=True
     )
 
     st.subheader("Fatturato totale")
@@ -293,7 +276,9 @@ def spent_per_age(df):
                 alt.Tooltip('Totale', title="Fatturato (in Euro)")
             ],
         )
-        .interactive(), use_container_width=True
+        .configure_axisX(
+            labelAngle=0
+        ), use_container_width=True
     )
 
     return
@@ -326,6 +311,9 @@ def spent_per_product(df, keyword=None):
 
     return
 
+# ------------------------------
+#             CORE
+# ------------------------------
 def core_analysis(source, start_date, end_date, status, status_str):
     if source == "":
         st.error('Errore: Inserire la fonte da cui recuperare i dati')
@@ -400,9 +388,17 @@ st.sidebar.text("Agenzia: Brain on strategy srl\nWebsite: https://brainonstrateg
 # ------------------------------
 st.title("Parametri della analisi")
 
-# st.subheader("Inserire la fonte")
-# source = st.text_input("Fonte")
-source = st.secrets["url"]
+env = environ.Env(
+    DEBUG = (bool, False)
+)
+
+DEBUG_MODE = env.bool('DEBUG_MODE', default=False)
+
+if DEBUG_MODE:
+    st.subheader("Inserire la fonte")
+    source = st.text_input("Fonte")
+else:
+    source = st.secrets["url"]
 
 st.subheader("Selezionare il periodo desiderato")
 start_date = st.date_input("Inizio", (datetime.today() - timedelta(days=31)))
