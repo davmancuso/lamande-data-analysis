@@ -339,7 +339,7 @@ def spent_per_product_category(df):
     st.subheader("Fatturato per categoria")
     st.write(chart_data)
 
-# ---------- WOOCOMMERCE ----------
+# ---------- PIXEL ----------
 # @st.cache
 # def pixel_url_data(pixel_id, start_date, end_date):
 #     pixel = AdsPixel(pixel_id)
