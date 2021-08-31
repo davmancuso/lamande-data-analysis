@@ -6,7 +6,7 @@ import numpy as np
 import streamlit as st
 import altair as alt
 from datetime import datetime, timedelta
-import matplotlib.pyplot as plt
+# from facebookads.adobjects.adspixel import AdsPixel
 
 # ------------------------------
 #             STYLE
@@ -30,6 +30,8 @@ st.markdown("""
 # ------------------------------
 #           FUNCTIONS
 # ------------------------------
+
+# ---------- WOOCOMMERCE ----------
 @st.cache
 def url_retrieving(source, start_date, end_date, status):
     start_date_url = str(start_date.strftime("%Y%m%d"))
@@ -337,10 +339,24 @@ def spent_per_product_category(df):
     st.subheader("Fatturato per categoria")
     st.write(chart_data)
 
+# ---------- WOOCOMMERCE ----------
+# @st.cache
+# def pixel_url_data(pixel_id, start_date, end_date):
+#     pixel = AdsPixel(pixel_id)
+#     dataset = pixel.get_stats(params={
+#         'aggregation': 'custom_data_field',
+#         'start_time': start_date,
+#         'end_time': end_date,
+#     })
+
+#     st.write(dataset)
+
+#     return dataset
+
 # ------------------------------
 #             CORE
 # ------------------------------
-def core_analysis(source, start_date, end_date, status, status_str):
+def woocommerce_analysis(source, start_date, end_date, status, status_str):
     if source == "":
         st.error('Errore: Inserire la fonte da cui recuperare i dati')
         return
@@ -401,6 +417,11 @@ def core_analysis(source, start_date, end_date, status, status_str):
 
     return
 
+# def facebook_analysis(pixel_id, start_date, end_date):
+#     dataset = pixel_url_data(pixel_id, start_date, end_date)
+
+    # return
+
 # ------------------------------
 #             SIDEBAR
 # ------------------------------
@@ -424,10 +445,13 @@ env = environ.Env(
 DEBUG_MODE = env.bool('DEBUG_MODE', default=False)
 
 if DEBUG_MODE:
+    st.subheader("Inserire il token di accesso di Facebook")
+    pixel_id = st.text_input("Access token")
     st.subheader("Inserire la fonte")
     source = st.text_input("Fonte")
 else:
     source = st.secrets["url"]
+    pixel_id = st.secrets["pixel_id"]
 
 st.subheader("Selezionare il periodo desiderato")
 start_date = st.date_input("Inizio", (datetime.today() - timedelta(days=31)))
@@ -447,4 +471,5 @@ elif status == 2:
     status = "canceled"
 
 if st.button("Scarica i dati"):
-    core_analysis(source, start_date, end_date, status, status_str)
+    # facebook_analysis(pixel_id, start_date, end_date)
+    woocommerce_analysis(source, start_date, end_date, status, status_str)
