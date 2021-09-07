@@ -31,6 +31,20 @@ st.markdown("""
 #           FUNCTIONS
 # ------------------------------
 
+# ---------- PIXEL ----------
+# @st.cache
+# def pixel_url_data(pixel_id, start_date, end_date):
+#     pixel = AdsPixel(pixel_id)
+#     dataset = pixel.get_stats(params={
+#         'aggregation': 'custom_data_field',
+#         'start_time': start_date,
+#         'end_time': end_date,
+#     })
+
+#     st.write(dataset)
+
+#     return dataset
+
 # ---------- WOOCOMMERCE ----------
 @st.cache
 def url_retrieving(source, start_date, end_date, status):
@@ -339,23 +353,15 @@ def spent_per_product_category(df):
     st.subheader("Fatturato per categoria")
     st.write(chart_data)
 
-# ---------- PIXEL ----------
-# @st.cache
-# def pixel_url_data(pixel_id, start_date, end_date):
-#     pixel = AdsPixel(pixel_id)
-#     dataset = pixel.get_stats(params={
-#         'aggregation': 'custom_data_field',
-#         'start_time': start_date,
-#         'end_time': end_date,
-#     })
-
-#     st.write(dataset)
-
-#     return dataset
-
 # ------------------------------
 #             CORE
 # ------------------------------
+
+# def facebook_analysis(pixel_id, start_date, end_date):
+#     dataset = pixel_url_data(pixel_id, start_date, end_date)
+
+    # return
+
 def woocommerce_analysis(source, start_date, end_date, status, status_str):
     if source == "":
         st.error('Errore: Inserire la fonte da cui recuperare i dati')
@@ -416,11 +422,6 @@ def woocommerce_analysis(source, start_date, end_date, status, status_str):
         spent_per_product_category(products)
 
     return
-
-# def facebook_analysis(pixel_id, start_date, end_date):
-#     dataset = pixel_url_data(pixel_id, start_date, end_date)
-
-    # return
 
 # ------------------------------
 #             SIDEBAR
