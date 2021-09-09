@@ -1,12 +1,13 @@
 import environ
 import json
+import urllib3
+import facebook
 import requests
 import pandas as pd
 import numpy as np
 import streamlit as st
 import altair as alt
 from datetime import datetime, timedelta
-# from facebookads.adobjects.adspixel import AdsPixel
 
 # ------------------------------
 #             STYLE
@@ -357,10 +358,10 @@ def spent_per_product_category(df):
 #             CORE
 # ------------------------------
 
-# def facebook_analysis(pixel_id, start_date, end_date):
-#     dataset = pixel_url_data(pixel_id, start_date, end_date)
+def facebook_analysis(user_access_token, pixel_id, start_date, end_date):
+    # graph = facebook.GraphAPI(access_token="user_access_token", version="11.0")
 
-    # return
+    return
 
 def woocommerce_analysis(source, start_date, end_date, status, status_str):
     if source == "":
@@ -446,12 +447,15 @@ env = environ.Env(
 DEBUG_MODE = env.bool('DEBUG_MODE', default=False)
 
 if DEBUG_MODE:
-    st.subheader("Inserire il token di accesso di Facebook")
-    pixel_id = st.text_input("Access token")
+    st.subheader("Inserire il token utente di accesso di Facebook")
+    user_access_token = st.text_input("User access token")
+    st.subheader("Inserire il Pixel ID di Facebook")
+    pixel_id = st.text_input("Pixel ID")
     st.subheader("Inserire la fonte")
     source = st.text_input("Fonte")
 else:
     source = st.secrets["url"]
+    user_access_token = st.secrets["user_access_token"]
     pixel_id = st.secrets["pixel_id"]
 
 st.subheader("Selezionare il periodo desiderato")
@@ -472,5 +476,5 @@ elif status == 2:
     status = "canceled"
 
 if st.button("Scarica i dati"):
-    # facebook_analysis(pixel_id, start_date, end_date)
     woocommerce_analysis(source, start_date, end_date, status, status_str)
+    # facebook_analysis(user_access_token, pixel_id, start_date, end_date)
