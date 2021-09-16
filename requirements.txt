@@ -25,6 +25,7 @@ chardet==4.0.0
 click==7.1.2
 crispy-bootstrap5==0.3.1
 crispy-tailwind==0.2.0
+curlify==2.2.1
 cycler==0.10.0
 debugpy==1.4.1
 decorator==5.0.9
@@ -35,7 +36,10 @@ django-crispy-forms==1.10.0
 django-environ==0.4.5
 django-tailwind==1.1.0
 entrypoints==0.3
+environ==1.0
+facebook-business==12.0.0
 facebook-sdk==3.1.0
+facebookads==2.11.4
 filelock==3.0.12
 gitdb==4.0.7
 GitPython==3.1.18
@@ -92,6 +96,7 @@ psutil==5.8.0
 psycopg2-binary==2.8.6
 ptyprocess==0.7.0
 pyarrow==5.0.0
+pycountry==20.7.3
 pycparser==2.20
 pydeck==0.7.0
 Pygments==2.10.0

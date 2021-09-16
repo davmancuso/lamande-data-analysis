@@ -447,6 +447,9 @@ env = environ.Env(
 DEBUG_MODE = env.bool('DEBUG_MODE', default=False)
 
 if DEBUG_MODE:
+    st.subheader("Inserire gli identificativi della app di Facebook")
+    app_id = st.text_input("App ID")
+    app_secret = st.text_input("App secret")
     st.subheader("Inserire il token utente di accesso di Facebook")
     user_access_token = st.text_input("User access token")
     st.subheader("Inserire il Pixel ID di Facebook")
@@ -455,6 +458,8 @@ if DEBUG_MODE:
     source = st.text_input("Fonte")
 else:
     source = st.secrets["url"]
+    user_access_token = st.secrets["app_id"]
+    user_access_token = st.secrets["app_secret"]
     user_access_token = st.secrets["user_access_token"]
     pixel_id = st.secrets["pixel_id"]
 
